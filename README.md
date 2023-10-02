@@ -1,9 +1,11 @@
 # Modul 1-2
 
-## Anggota kelompok
-- Hafiz Akmaldi Santosa (5027221061)
-- Steven Figo (5027221021)
-- Rizki Ramadhani (5027221013)
+## Anggota kelompok P13
+| NRP        | Nama                    |
+|:----------:|:-----------------------:|
+| 5027221061 | Hafiz Akmaldi Santosa   |
+| 5027221021 | Steven Figo             |
+| 5027221013 | Rizki Ramadhani         |
 
 This template should help get you started developing with Vue 3 in Vite.
 
