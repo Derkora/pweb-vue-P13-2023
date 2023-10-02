@@ -1,6 +1,6 @@
 <template>
   <div class="task">
-    <h2 class="green">smangat beb {{ $route.params.id }}</h2>
+    <h2 class="green">Smangat beb {{ $route.params.id }}</h2>
 
     <!-- Tombol untuk menampilkan modal tambah tugas -->
     <button @click="showAddTaskModal" class="tambahTugas">Tambah Tugas</button>
@@ -31,6 +31,14 @@
         <label for="taskDate">Tanggal:</label>
         <input v-model="task.date" id="taskDate" type="date" />
 
+        <label for="taskPriority">Prioritas:</label>
+        <select v-model="task.priority" id="taskPriority">
+          <option value="">Tanpa Prioritas</option>
+          <option value="!">Prioritas Rendah (!)</option>
+          <option value="!!">Prioritas Sedang (!!)</option>
+          <option value="!!!">Prioritas Tinggi (!!!)</option>
+        </select>
+
         <button @click="saveTask">{{ isEditing ? 'Simpan Perubahan' : 'Simpan' }}</button>
         <button @click="closeTaskModal">Batal</button>
       </div>
@@ -39,8 +47,8 @@
     <!-- Daftar tugas -->
     <ul>
       <li v-for="(task, index) in sortedTasks" :key="index" class="task-item">
-        <input type="checkbox" v-model="task.completed"/>
-        {{ task.name }} | {{ task.category }} | {{ task.date }}
+        <input type="checkbox" v-model="task.completed" />
+        <span :class="getPriorityClass(task.priority)">{{ task.name }}</span> | {{ task.category }} | {{ task.date }}
         <button @click="editTask(index)" class="edit-button">Edit</button>
         <button @click="deleteTask(index)" class="delete-button">Hapus</button>
       </li>
@@ -57,7 +65,8 @@ export default {
       task: {
         name: "",
         category: "Tugas",
-        date: ""
+        date: "",
+        priority: ""
       },
       tasks: [],
       selectedSortCategory: ""
@@ -133,14 +142,26 @@ export default {
       localStorage.setItem(this.localStorageKey, JSON.stringify(this.tasks));
     },
     resetTask() {
-      this.task = { name: "", category: "Tugas", date: "" };
+      this.task = { name: "", category: "Tugas", date: "", priority: "" };
+    },
+    getPriorityClass(priority) {
+      switch (priority) {
+        case "!":
+          return "priority-low";
+        case "!!":
+          return "priority-medium";
+        case "!!!":
+          return "priority-high";
+        default:
+          return "";
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-/* CSS untuk modal */
+/* Gaya CSS untuk modal */
 .modal {
   position: fixed;
   top: 0;
@@ -154,7 +175,7 @@ export default {
 }
 
 .modal-content {
-  background-color: rgb(41, 41, 41) ;
+  background-color: rgb(41, 41, 41);
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -175,6 +196,7 @@ export default {
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
+/* Gaya tombol "Tambah Tugas" */
 .tambahTugas {
   margin-top: 16px;
   margin-bottom: 16px;
@@ -188,6 +210,7 @@ export default {
   cursor: pointer;
 }
 
+/* Gaya dropdown kategori */
 .category {
   margin-top: 16px;
   margin-bottom: 16px;
@@ -198,10 +221,12 @@ export default {
   border-color: #00bd7e;
 }
 
+/* Gaya option pada dropdown kategori */
 .option {
   color: black;
 }
 
+/* Gaya umum untuk tampilan daftar tugas */
 .task {
   background-color: rgb(41, 41, 41);
   padding: 32px;
@@ -209,10 +234,12 @@ export default {
   color: whitesmoke;
 }
 
+/* Gaya item tugas */
 .task-item {
   margin-bottom: 10px;
 }
 
+/* Gaya tombol Edit dan Hapus */
 .edit-button,
 .delete-button {
   background: none;
@@ -224,13 +251,28 @@ export default {
   margin-left: 10px;
 }
 
+/* Gaya hover untuk tombol Edit dan Hapus */
 .edit-button:hover,
 .delete-button:hover {
   background-color: #00bd7e;
   color: black;
 }
 
-.green {
+/* Gaya teks prioritas rendah */
+.priority-low {
   color: #00bd7e;
+  font-weight: bold;
+}
+
+/* Gaya teks prioritas sedang */
+.priority-medium {
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+/* Gaya teks prioritas tinggi */
+.priority-high {
+  color: #ff4444;
+  font-weight: bold;
 }
 </style>
