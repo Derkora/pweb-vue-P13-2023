@@ -1,6 +1,6 @@
 <template>
   <div class="task">
-    <h2 class="green">smangat beb</h2>
+    <h2 class="green">smangat beb {{ $route.params.id }}</h2>
 
     <!-- Tombol untuk menampilkan modal tambah tugas -->
     <button @click="showAddTaskModal" class="tambahTugas">Tambah Tugas</button>
@@ -10,8 +10,8 @@
       <label for="sortCategory">Urutkan berdasarkan Kategori:</label>
     </div>
     <select v-model="selectedSortCategory" id="sortCategory" class="category">
-        <option value="" class="option">Semua Kategori</option>
-        <option v-for="category in uniqueCategories" :key="category" class="option">{{ category }}</option>
+      <option value="" class="option">Semua Kategori</option>
+      <option v-for="category in uniqueCategories" :key="category" class="option">{{ category }}</option>
     </select>
 
     <!-- Modal untuk menambah/mengedit tugas -->
@@ -38,11 +38,11 @@
 
     <!-- Daftar tugas -->
     <ul>
-      <li v-for="(task, index) in sortedTasks" :key="index">
+      <li v-for="(task, index) in sortedTasks" :key="index" class="task-item">
         <input type="checkbox" v-model="task.completed"/>
         {{ task.name }} | {{ task.category }} | {{ task.date }}
-        <button @click="editTask(index)">Edit</button>
-        <button @click="deleteTask(index)">Hapus</button>
+        <button @click="editTask(index)" class="edit-button">Edit</button>
+        <button @click="deleteTask(index)" class="delete-button">Hapus</button>
       </li>
     </ul>
   </div>
@@ -63,13 +63,16 @@ export default {
       selectedSortCategory: ""
     };
   },
-  created() {
-    // Mengambil daftar tugas dari localStorage saat komponen dibuat
-    if (localStorage.getItem("tasks")) {
-      this.tasks = JSON.parse(localStorage.getItem("tasks"));
-    }
-  },
   computed: {
+    // Menggunakan nama pengguna sebagai bagian dari kunci local storage
+    localStorageKey() {
+      return `tasks_${this.$route.params.id}`; // Gunakan ID pengguna atau identifikasi unik lainnya
+    },
+    // Mengambil tugas dari local storage sesuai dengan entitas yang diidentifikasi
+    storedTasks() {
+      const tasksJSON = localStorage.getItem(this.localStorageKey);
+      return tasksJSON ? JSON.parse(tasksJSON) : [];
+    },
     sortedTasks() {
       if (this.selectedSortCategory) {
         return this.tasks.filter(task => task.category === this.selectedSortCategory);
@@ -80,6 +83,10 @@ export default {
     uniqueCategories() {
       return [...new Set(this.tasks.map(task => task.category))];
     }
+  },
+  created() {
+    // Mengambil daftar tugas dari local storage saat komponen dibuat
+    this.tasks = this.storedTasks;
   },
   methods: {
     showAddTaskModal() {
@@ -109,8 +116,8 @@ export default {
         this.tasks.push({ ...this.task, completed: false });
       }
 
-      // Simpan daftar tugas ke localStorage
-      localStorage.setItem("tasks", JSON.stringify(this.tasks));
+      // Simpan daftar tugas ke local storage sesuai dengan entitas yang diidentifikasi
+      localStorage.setItem(this.localStorageKey, JSON.stringify(this.tasks));
 
       this.closeTaskModal();
     },
@@ -122,8 +129,8 @@ export default {
     },
     deleteTask(index) {
       this.tasks.splice(index, 1);
-      // Simpan daftar tugas ke localStorage setelah menghapus
-      localStorage.setItem("tasks", JSON.stringify(this.tasks));
+      // Simpan daftar tugas ke local storage setelah menghapus
+      localStorage.setItem(this.localStorageKey, JSON.stringify(this.tasks));
     },
     resetTask() {
       this.task = { name: "", category: "Tugas", date: "" };
@@ -151,11 +158,13 @@ export default {
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: whitesmoke;
 }
 
 .modal-content label {
   display: block;
   margin-bottom: 5px;
+  color: whitesmoke;
 }
 
 .modal-content input,
@@ -177,7 +186,6 @@ export default {
   border-width: 2px;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   cursor: pointer;
-
 }
 
 .category {
@@ -198,6 +206,31 @@ export default {
   background-color: rgb(41, 41, 41);
   padding: 32px;
   border-radius: 16px;
+  color: whitesmoke;
 }
 
+.task-item {
+  margin-bottom: 10px;
+}
+
+.edit-button,
+.delete-button {
+  background: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: whitesmoke;
+  border-color: #00bd7e;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+  background-color: #00bd7e;
+  color: black;
+}
+
+.green {
+  color: #00bd7e;
+}
 </style>
